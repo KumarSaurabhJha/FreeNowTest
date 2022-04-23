@@ -1,10 +1,7 @@
 package com.free.now.test.application
 
 import android.app.Application
-import com.free.now.test.di.domainModule
-import com.free.now.test.di.restApiModule
-import com.free.now.test.di.restRepositoryModule
-import com.free.now.test.di.retrofitModule
+import com.free.now.test.di.*
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -22,7 +19,8 @@ class MainApplication : Application() {
                 restRepositoryModule,
                 restApiModule,
                 domainModule,
-                retrofitModule
+                retrofitModule,
+                viewModelModule
             )
         }
     }
