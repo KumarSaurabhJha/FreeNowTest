@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">FreeNowTest</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="fleet_type_taxi">Travel alone</string>
+    <string name="fleet_type_pool">Share a Ride</string>
+
 </resources>

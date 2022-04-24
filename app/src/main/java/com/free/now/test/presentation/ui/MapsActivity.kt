@@ -1,10 +1,12 @@
 package com.free.now.test.presentation.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.free.now.test.R
+import com.free.now.test.data.model.Poi
 import com.free.now.test.databinding.ActivityMapsBinding
+import com.free.now.test.presentation.util.setDivider
 import com.free.now.test.presentation.viewmodel.POIViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -18,6 +20,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    private lateinit var adapter: PoiAdapter
 
     private val poiViewModel: POIViewModel by viewModel()
 
@@ -38,11 +42,39 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     }
 
     private fun setObservers() {
-        poiViewModel.poiDisplayList.observe(this){
-            it.getContentIfNotHandled()?.let { poiDataList ->
+        poiViewModel.poiDisplayList.observe(this) {
+            it.getContentIfNotHandled()?.let { poiList ->
+                setupAdapter(poiList)
+                addPoiMarkersToMap(poiList)
             }
         }
     }
+
+    private fun setupAdapter(poiList: List<Poi>) {
+
+        val recyclerView = binding.rvPoiDataList
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.setDivider(R.drawable.recycler_view_divider)
+        adapter = PoiAdapter(poiList) {
+            onListItemClick(it)
+        }
+
+        recyclerView.adapter = adapter
+    }
+
+    private fun addPoiMarkersToMap(poiList: List<Poi>) {
+        poiList.forEach {
+            displayMarkerOnMap(it.coordinate.latitude, it.coordinate.longitude, it.fleetType)
+        }
+    }
+
+
+    private fun onListItemClick(poi: Poi) {
+        val coordinates = LatLng(poi.coordinate.latitude, poi.coordinate.longitude)
+        mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
+        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f))
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -55,10 +87,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
+        displayMarkerOnMap(53.5511, 9.9937)
+    }
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+
+    private fun displayMarkerOnMap(lat: Double, lon: Double, markerName: String = "") {
+        if (this::mMap.isInitialized) {
+            val coordinates = LatLng(lat, lon)
+            if (markerName.isNotEmpty()) {
+                mMap.addMarker(MarkerOptions().position(coordinates).title(markerName))
+            }else{
+                mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
+                mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f))
+            }
+        }
     }
 }
