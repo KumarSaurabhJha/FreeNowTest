@@ -1,20 +1,25 @@
-package com.free.now.test
+package com.free.now.test.presentation.ui
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.free.now.test.R
+import com.free.now.test.databinding.ActivityMapsBinding
+import com.free.now.test.presentation.viewmodel.POIViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
-import com.free.now.test.databinding.ActivityMapsBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private lateinit var mMap: GoogleMap
     private lateinit var binding: ActivityMapsBinding
+
+    private val poiViewModel: POIViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,6 +31,17 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         val mapFragment = supportFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+
+        poiViewModel.init()
+        setObservers()
+
+    }
+
+    private fun setObservers() {
+        poiViewModel.poiDisplayList.observe(this){
+            it.getContentIfNotHandled()?.let { poiDataList ->
+            }
+        }
     }
 
     /**
