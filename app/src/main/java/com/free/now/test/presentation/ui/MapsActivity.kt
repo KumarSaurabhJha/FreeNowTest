@@ -36,7 +36,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
 
-        poiViewModel.init()
         setObservers()
 
     }
@@ -71,35 +70,37 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
     private fun onListItemClick(poi: Poi) {
         val coordinates = LatLng(poi.coordinate.latitude, poi.coordinate.longitude)
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
-        mMap.animateCamera(CameraUpdateFactory.zoomTo(12.0f))
+
+        if (this::mMap.isInitialized) {
+            moveCameraOnMap(mMap, coordinates, 12.0f)
+        }
     }
 
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
+     * Using geo Coordinates of Hamburg as default value to stick the camera to
      */
     override fun onMapReady(googleMap: GoogleMap) {
         mMap = googleMap
-        displayMarkerOnMap(53.5511, 9.9937)
+        val defaultGeoCoordinate = LatLng(53.5511, 9.9937)
+        poiViewModel.init()
+        moveCameraOnMap(mMap, defaultGeoCoordinate, 9.0f)
     }
 
-
-    private fun displayMarkerOnMap(lat: Double, lon: Double, markerName: String = "") {
+    private fun displayMarkerOnMap(lat: Double, lon: Double, markerName: String) {
         if (this::mMap.isInitialized) {
             val coordinates = LatLng(lat, lon)
-            if (markerName.isNotEmpty()) {
-                mMap.addMarker(MarkerOptions().position(coordinates).title(markerName))
-            }else{
-                mMap.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
-                mMap.animateCamera(CameraUpdateFactory.zoomTo(9.0f))
-            }
+            mMap.addMarker(MarkerOptions().position(coordinates).title(markerName))
         }
+    }
+
+    private fun moveCameraOnMap(map: GoogleMap, coordinates: LatLng, zoomValue: Float) {
+        map.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
+        map.animateCamera(CameraUpdateFactory.zoomTo(zoomValue))
     }
 }
