@@ -6,7 +6,7 @@ import com.free.now.test.data.repository.PoiRepository
 import com.free.now.test.domain.UseCase
 import com.free.now.test.domain.model.DesiredPoiCoordinates
 
-class GetPoiListUseCase(
+open class GetPoiListUseCase(
     private val poiRepository: PoiRepository
 ) : UseCase<DesiredPoiCoordinates, PoiDataList> {
 

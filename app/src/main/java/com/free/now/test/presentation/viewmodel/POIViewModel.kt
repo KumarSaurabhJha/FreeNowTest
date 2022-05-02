@@ -22,14 +22,6 @@ class POIViewModel(private val getPoiListUseCase: GetPoiListUseCase) : ViewModel
 
     private var fetchDataJob: Job? = null
 
-    fun cancelDataFetch() {
-        fetchDataJob?.let {
-            if (it.isActive) {
-                it.cancel()
-            }
-        }
-    }
-
     fun init() {
         fetchDataJob = viewModelScope.launch(Dispatchers.IO) {
             val list = getPoiListUseCase.execute(desiredPoiCoordinates)
