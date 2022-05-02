@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.free.now.test.R
 import com.free.now.test.data.model.Poi
 import com.free.now.test.databinding.ActivityMapsBinding
+import com.free.now.test.presentation.ui.dialog.DoubleActionAlertDialog
 import com.free.now.test.presentation.util.setDivider
 import com.free.now.test.presentation.viewmodel.POIViewModel
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,6 +23,24 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityMapsBinding
 
     private lateinit var adapter: PoiAdapter
+
+    private val errorDialog = DoubleActionAlertDialog(
+        R.string.error_dialog_title,
+        R.string.error_dialog_message,
+        R.string.dialog_try_again_button,
+        R.string.dialog_exit_button,
+        { onTryAgainClick() },
+        { onExitClick() }
+    )
+
+    private fun onExitClick() {
+        poiViewModel.cancelDataFetch()
+        finish()
+    }
+
+    private fun onTryAgainClick() {
+        poiViewModel.init()
+    }
 
     private val poiViewModel: POIViewModel by viewModel()
 
@@ -46,6 +65,20 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
                 setupAdapter(poiList)
                 addPoiMarkersToMap(poiList)
             }
+        }
+        poiViewModel.error.observe(this) {
+            it.getContentIfNotHandled()?.let { error ->
+                if (error) {
+                    showErrorDialog()
+                }
+            }
+        }
+    }
+
+    private fun showErrorDialog() {
+        if (!errorDialog.isAdded) {
+            errorDialog.isCancelable = false
+            errorDialog.show(supportFragmentManager, "error")
         }
     }
 
@@ -102,5 +135,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun moveCameraOnMap(map: GoogleMap, coordinates: LatLng, zoomValue: Float) {
         map.moveCamera(CameraUpdateFactory.newLatLng(coordinates))
         map.animateCamera(CameraUpdateFactory.zoomTo(zoomValue))
+    }
+
+    override fun onPause() {
+        super.onPause()
+        poiViewModel.cancelDataFetch()
     }
 }

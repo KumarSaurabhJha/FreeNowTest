@@ -3,5 +3,10 @@
     <string name="title_activity_maps">MapsActivity</string>
     <string name="fleet_type_taxi">Travel alone</string>
     <string name="fleet_type_pool">Share a Ride</string>
-
+    <string name="error_dialog_title">Error</string>
+    <string name="error_dialog_message">Unexpected Error</string>
+    <string name="dialog_exit_button">Exit</string>
+    <string name="dialog_try_again_button">Try Again</string>
+    <string name="no_network_dialog_title">Network Error</string>
+    <string name="no_network_dialog_message">Please check your internet connection</string>
 </resources>
